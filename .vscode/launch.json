@@ -1,0 +1,43 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Backend: FastAPI",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}\\backend\\.venv\\Scripts\\python.exe",
+      "args": ["-m", "uvicorn", "app.main:app", "--reload", "--host", "0.0.0.0", "--port", "8000"],
+      "cwd": "${workspaceFolder}\\backend",
+      "envFile": "${workspaceFolder}\\.env",
+      "console": "integratedTerminal",
+      "justMyCode": false,
+      "preLaunchTask": "Backend: Install deps"
+    },
+    {
+      "name": "Backend: Celery Worker",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}\\backend\\.venv\\Scripts\\python.exe",
+      "args": ["-m", "celery", "-A", "app.core.celery_app.celery_app", "worker", "--loglevel=info", "--pool=solo"],
+      "cwd": "${workspaceFolder}\\backend",
+      "envFile": "${workspaceFolder}\\.env",
+      "console": "integratedTerminal",
+      "justMyCode": false,
+      "preLaunchTask": "Backend: Install deps"
+    },
+    {
+      "name": "Frontend: Next.js",
+      "type": "node-terminal",
+      "request": "launch",
+      "command": "npm run dev",
+      "cwd": "${workspaceFolder}\\frontend"
+    }
+  ],
+  "compounds": [
+    {
+      "name": "Full Stack: VS Code",
+      "configurations": ["Backend: FastAPI", "Backend: Celery Worker", "Frontend: Next.js"],
+      "preLaunchTask": "Setup: Copy .env"
+    }
+  ]
+}

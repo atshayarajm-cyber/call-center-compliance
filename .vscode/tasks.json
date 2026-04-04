@@ -1,0 +1,121 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Setup: Copy .env",
+      "type": "shell",
+      "command": "if (!(Test-Path .env)) { Copy-Item .env.example .env }",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Infra: Docker Postgres + Redis",
+      "type": "shell",
+      "command": "docker compose --env-file ../.env up postgres redis",
+      "options": {
+        "cwd": "${workspaceFolder}\\docker"
+      },
+      "problemMatcher": [],
+      "isBackground": true
+    },
+    {
+      "label": "Backend: Create venv",
+      "type": "shell",
+      "command": "py -m venv .venv",
+      "options": {
+        "cwd": "${workspaceFolder}\\backend"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Backend: Install deps",
+      "type": "shell",
+      "command": ".\\.venv\\Scripts\\python.exe -m pip install -r requirements.txt",
+      "options": {
+        "cwd": "${workspaceFolder}\\backend"
+      },
+      "dependsOn": ["Backend: Create venv"],
+      "problemMatcher": []
+    },
+    {
+      "label": "Frontend: Install deps",
+      "type": "shell",
+      "command": "npm install",
+      "options": {
+        "cwd": "${workspaceFolder}\\frontend"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Run: Backend API",
+      "type": "shell",
+      "command": ".\\.venv\\Scripts\\python.exe -m uvicorn app.main:app --reload --host 0.0.0.0 --port 8000",
+      "options": {
+        "cwd": "${workspaceFolder}\\backend"
+      },
+      "dependsOn": ["Setup: Copy .env", "Backend: Install deps"],
+      "isBackground": true,
+      "problemMatcher": {
+        "owner": "custom",
+        "pattern": {
+          "regexp": "."
+        },
+        "background": {
+          "activeOnStart": true,
+          "beginsPattern": ".*Uvicorn running on.*|.*Started reloader process.*",
+          "endsPattern": ".*Application startup complete.*|.*Uvicorn running on.*"
+        }
+      }
+    },
+    {
+      "label": "Run: Celery Worker",
+      "type": "shell",
+      "command": ".\\.venv\\Scripts\\python.exe -m celery -A app.core.celery_app.celery_app worker --loglevel=info --pool=solo",
+      "options": {
+        "cwd": "${workspaceFolder}\\backend"
+      },
+      "dependsOn": ["Setup: Copy .env", "Backend: Install deps"],
+      "isBackground": true,
+      "problemMatcher": {
+        "owner": "custom",
+        "pattern": {
+          "regexp": "."
+        },
+        "background": {
+          "activeOnStart": true,
+          "beginsPattern": ".*",
+          "endsPattern": ".*ready.*"
+        }
+      }
+    },
+    {
+      "label": "Run: Frontend",
+      "type": "shell",
+      "command": "npm run dev",
+      "options": {
+        "cwd": "${workspaceFolder}\\frontend"
+      },
+      "dependsOn": ["Setup: Copy .env", "Frontend: Install deps"],
+      "isBackground": true,
+      "problemMatcher": {
+        "owner": "custom",
+        "pattern": {
+          "regexp": "."
+        },
+        "background": {
+          "activeOnStart": true,
+          "beginsPattern": ".*",
+          "endsPattern": ".*Ready in.*|.*Local:.*"
+        }
+      }
+    },
+    {
+      "label": "Run: Full App (VS Code)",
+      "dependsOrder": "parallel",
+      "dependsOn": ["Infra: Docker Postgres + Redis", "Run: Backend API", "Run: Celery Worker", "Run: Frontend"],
+      "problemMatcher": []
+    }
+  ]
+}

@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CallIQ Analytics Platform</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div id="introLoader" class="intro-loader">
+      <div class="intro-core"></div>
+      <div class="intro-copy">
+        <span class="eyebrow">Booting Workspace</span>
+        <h2>Preparing CallIQ command center</h2>
+        <p>Loading analytics surfaces, motion layers, and report interactions.</p>
+      </div>
+    </div>
+    <div class="background-glow"></div>
+    <header class="topbar">
+      <div class="brand">
+        <div class="brand-badge">CallIQ</div>
+        <div>
+          <h1>AI Call Center Analytics</h1>
+          <p>Operations platform for transcription, QA compliance, payment intent, and rejection analysis</p>
+        </div>
+      </div>
+      <div class="topbar-actions">
+        <input id="apiBaseInput" class="input small" placeholder="API base URL" />
+        <input id="apiKeyInput" class="input small" placeholder="Bearer API key" />
+        <button id="themeToggle" class="button ghost">Theme</button>
+        <button id="saveApiKey" class="button ghost">Save Key</button>
+      </div>
+    </header>
+
+    <main class="layout">
+      <aside class="sidebar card">
+        <button class="nav-link active" data-section="overview">Overview</button>
+        <button class="nav-link" data-section="upload">Upload</button>
+        <button class="nav-link" data-section="status">Job Status</button>
+        <button class="nav-link" data-section="report">Report</button>
+        <button class="nav-link" data-section="history">History</button>
+        <button class="nav-link" data-section="admin">Admin SOP</button>
+      </aside>
+
+      <section class="content">
+        <section id="overview" class="panel active">
+          <div class="hero card">
+            <div>
+              <span class="eyebrow">Analytics Platform</span>
+              <h2>Review every customer call as a structured compliance and payment intelligence report</h2>
+              <p>
+                Upload recordings or audio URLs, track asynchronous processing, and deliver production-style reports for
+                summary, SOP validation, payment categorisation, rejection reasoning, and keyword extraction.
+              </p>
+              <div class="hero-actions">
+                <button class="button primary" data-jump="upload">Start Analysis</button>
+                <button class="button ghost" data-jump="history">View History</button>
+              </div>
+              <div class="pulse-row">
+                <span class="pulse-chip">Speech-to-text pipeline</span>
+                <span class="pulse-chip">Compliance scoring</span>
+                <span class="pulse-chip">Operational reporting</span>
+              </div>
+            </div>
+            <div class="hero-stats">
+              <div class="stat-card">
+                <span>Processing Confidence</span>
+                <strong class="counter" data-target="98">0</strong>
+                <small>target pipeline reliability</small>
+              </div>
+              <div class="stat-card">
+                <span>Language Coverage</span>
+                <strong class="counter" data-target="2">0</strong>
+                <small>Hindi and Tamil mixed speech</small>
+              </div>
+              <div class="stat-card">
+                <span>Report Modules</span>
+                <strong class="counter" data-target="7">0</strong>
+                <small>core analytics outputs</small>
+              </div>
+              <div class="stat-card">
+                <span>Status Refresh</span>
+                <strong class="counter" data-target="24">0</strong>
+                <small>live polling cycle readiness</small>
+              </div>
+            </div>
+          </div>
+          <div class="overview-grid">
+            <div class="card overview-panel">
+              <div class="section-heading compact">
+                <div>
+                  <span class="eyebrow">Operations Overview</span>
+                  <h2>Live portfolio snapshot</h2>
+                </div>
+                <div id="backendHealthBadge" class="pill good">Backend ready</div>
+              </div>
+              <div class="kpi-grid">
+                <div class="kpi-card">
+                  <span>Session Jobs</span>
+                  <strong id="kpiCompletion">0</strong>
+                  <div class="mini-line"><span></span></div>
+                </div>
+                <div class="kpi-card">
+                  <span>Completed</span>
+                  <strong id="kpiSop">0</strong>
+                  <div class="mini-line violet"><span></span></div>
+                </div>
+                <div class="kpi-card">
+                  <span>Reports Ready</span>
+                  <strong id="kpiPayment">0</strong>
+                  <div class="mini-line green"><span></span></div>
+                </div>
+                <div class="kpi-card">
+                  <span>Failed Jobs</span>
+                  <strong id="kpiRisk">0</strong>
+                  <div class="mini-line amber"><span></span></div>
+                </div>
+              </div>
+            </div>
+            <div class="card overview-panel">
+              <div class="section-heading compact">
+                <div>
+                  <span class="eyebrow">Processing Mix</span>
+                  <h2>Pipeline distribution</h2>
+                </div>
+              </div>
+              <div id="distributionBars" class="distribution-bars"></div>
+            </div>
+          </div>
+          <div class="card waveform-card">
+            <div class="section-heading compact">
+              <div>
+                <span class="eyebrow">Signal Preview</span>
+                <h2>Audio waveform visual</h2>
+              </div>
+              <div class="pill">Monitoring</div>
+            </div>
+            <div id="waveform" class="waveform"></div>
+          </div>
+        </section>
+
+        <section id="upload" class="panel">
+          <div class="card">
+            <div class="section-heading">
+              <div>
+                <span class="eyebrow">Upload</span>
+                <h2>Analyze call audio</h2>
+              </div>
+              <div id="submitState" class="pill">Idle</div>
+            </div>
+
+            <div class="grid two">
+              <div class="field">
+                <label>Single Audio URL</label>
+                <input id="audioUrl" class="input" placeholder="https://example.com/audio.mp3" />
+              </div>
+              <div class="field">
+                <label>Language Hint</label>
+                <select id="languageHint" class="input">
+                  <option value="hi" selected>Hindi / Hinglish</option>
+                  <option value="ta">Tamil / Tanglish</option>
+                  <option value="auto">Auto detect</option>
+                </select>
+                <small class="field-note">For the fastest local run, choose Hindi or Tamil instead of Auto detect.</small>
+              </div>
+            </div>
+
+            <div class="field">
+              <label>Batch Audio URLs</label>
+              <textarea id="batchUrls" class="input textarea" placeholder="One URL per line"></textarea>
+            </div>
+
+            <div class="field">
+              <label>Audio File Upload</label>
+              <input id="audioFile" type="file" class="input" accept="audio/*" />
+            </div>
+
+            <div class="actions">
+              <button id="submitJob" class="button primary">Submit Job</button>
+              <button id="submitBatch" class="button ghost">Submit Batch</button>
+              <button id="clearUpload" class="button ghost">Clear</button>
+            </div>
+            <div id="batchResult" class="status-card hidden"></div>
+          </div>
+        </section>
+
+        <section id="status" class="panel">
+          <div class="card">
+            <div class="section-heading">
+              <div>
+                <span class="eyebrow">Status</span>
+                <h2>Track async jobs</h2>
+              </div>
+            </div>
+
+            <div class="grid two">
+              <div class="field">
+                <label>Job ID</label>
+                <input id="jobIdInput" class="input" placeholder="Paste job id" />
+              </div>
+              <div class="actions inline">
+                <button id="checkStatus" class="button primary">Fetch Status</button>
+                <button id="startPolling" class="button ghost">Auto Poll</button>
+                <button id="retryJob" class="button ghost">Retry Failed Job</button>
+              </div>
+            </div>
+
+            <div class="progress-shell">
+              <div id="progressBar" class="progress-bar"></div>
+            </div>
+            <div id="statusTimeline" class="timeline">
+              <div class="timeline-step active">Queued</div>
+              <div class="timeline-step">Transcription</div>
+              <div class="timeline-step">Analytics</div>
+              <div class="timeline-step">Completed</div>
+            </div>
+            <div id="statusDetails" class="status-card">No job loaded yet.</div>
+            <div class="status-metrics grid three">
+              <div class="card soft insight-card">
+                <span class="eyebrow">Current Stage</span>
+                <strong id="statusStageLabel">Queued</strong>
+              </div>
+              <div class="card soft insight-card">
+                <span class="eyebrow">Retries</span>
+                <strong id="statusRetryLabel">0</strong>
+              </div>
+              <div class="card soft insight-card">
+                <span class="eyebrow">Health</span>
+                <strong id="statusHealthLabel">Ready</strong>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section id="report" class="panel">
+          <div class="card">
+            <div class="section-heading">
+              <div>
+                <span class="eyebrow">Report</span>
+                <h2>Call intelligence report</h2>
+              </div>
+              <div class="actions inline">
+                <button id="downloadJson" class="button ghost">Download JSON</button>
+              </div>
+            </div>
+
+            <div id="reportEmpty" class="empty-state">Load a completed report to see transcript analytics.</div>
+            <div id="reportContent" class="report hidden">
+              <div class="card soft">
+                <span class="eyebrow">Summary</span>
+                <p id="summaryText"></p>
+              </div>
+
+              <div class="grid three insights-grid">
+                <div class="card soft insight-card">
+                  <span class="eyebrow">Primary Payment</span>
+                  <strong id="insightPayment">Unknown</strong>
+                </div>
+                <div class="card soft insight-card">
+                  <span class="eyebrow">Primary Rejection</span>
+                  <strong id="insightRejection">None</strong>
+                </div>
+                <div class="card soft insight-card">
+                  <span class="eyebrow">Keyword Count</span>
+                  <strong id="insightKeywords">0</strong>
+                </div>
+              </div>
+
+              <div class="grid two">
+                <div class="card soft">
+                  <span class="eyebrow">Raw Transcript</span>
+                  <div class="transcript-toolbar">
+                    <button id="focusRaw" class="tiny-button active">Raw</button>
+                    <button id="focusClean" class="tiny-button">Cleaned</button>
+                  </div>
+                  <pre id="rawTranscript"></pre>
+                </div>
+                <div class="card soft">
+                  <span class="eyebrow">Cleaned Transcript</span>
+                  <pre id="cleanTranscript"></pre>
+                </div>
+              </div>
+
+              <div class="grid two">
+                <div class="card soft">
+                  <span class="eyebrow">SOP Score</span>
+                  <div class="score-wrap">
+                    <div id="sopScore" class="score-circle">0</div>
+                    <div id="sopChecks" class="stack"></div>
+                  </div>
+                </div>
+                <div class="card soft">
+                  <span class="eyebrow">Payment Analysis</span>
+                  <div id="paymentPrimary" class="primary-metric">Unknown</div>
+                  <div id="paymentBars" class="stack"></div>
+                  <div id="paymentEvidence" class="tag-list"></div>
+                </div>
+              </div>
+
+              <div class="grid two">
+                <div class="card soft">
+                  <span class="eyebrow">Rejection Analysis</span>
+                  <div id="rejectionPrimary" class="primary-metric">None</div>
+                  <div id="rejectionReasons" class="tag-list"></div>
+                  <div id="rejectionEvidence" class="stack"></div>
+                </div>
+                <div class="card soft">
+                  <span class="eyebrow">Keywords</span>
+                  <div id="keywordList" class="tag-list"></div>
+                </div>
+              </div>
+              <div class="grid two">
+                <div class="card soft">
+                  <span class="eyebrow">Executive Brief</span>
+                  <div id="executiveBrief" class="stack"></div>
+                </div>
+                <div class="card soft">
+                  <span class="eyebrow">Recommendation Engine</span>
+                  <div id="recommendationList" class="stack"></div>
+                </div>
+              </div>
+
+              <div class="card soft">
+                <span class="eyebrow">Quick Actions</span>
+                <div class="actions">
+                  <button id="copySummary" class="button ghost">Copy Summary</button>
+                  <button id="copyJobId" class="button ghost">Copy Job ID</button>
+                  <button class="button ghost" data-jump="history">Open History</button>
+                  <button class="button ghost" data-jump="status">Open Status</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section id="history" class="panel">
+          <div class="card">
+            <div class="section-heading">
+              <div>
+                <span class="eyebrow">History</span>
+                <h2>Recent jobs</h2>
+              </div>
+              <div class="actions inline">
+                <button id="loadHistory" class="button primary">Refresh</button>
+                <button id="clearHistory" class="button ghost">Clear History</button>
+              </div>
+            </div>
+            <div id="batchTrackerCard" class="card soft batch-card hidden">
+              <div class="section-heading compact">
+                <div>
+                  <span class="eyebrow">Latest Batch</span>
+                  <h2>Batch monitor</h2>
+                </div>
+                <div class="actions inline">
+                  <button id="refreshBatchTracker" class="button ghost">Refresh Batch</button>
+                  <button id="clearBatchTracker" class="button ghost">Clear Batch View</button>
+                </div>
+              </div>
+              <div id="batchSummary" class="status-card">No active batch selected.</div>
+              <div id="batchTrackerList" class="stack"></div>
+            </div>
+            <div id="historyList" class="stack">
+              <div class="empty-state">No history loaded.</div>
+            </div>
+          </div>
+        </section>
+
+        <section id="admin" class="panel">
+          <div class="card">
+            <div class="section-heading">
+              <div>
+                <span class="eyebrow">Admin</span>
+                <h2>SOP template</h2>
+              </div>
+              <button id="loadSopTemplate" class="button primary">Load SOP Template</button>
+            </div>
+            <div id="sopTemplateList" class="grid two">
+              <div class="empty-state">Load the current admin SOP template.</div>
+            </div>
+          </div>
+        </section>
+      </section>
+    </main>
+
+    <div id="toast" class="toast hidden"></div>
+
+    <script src="./app.js"></script>
+  </body>
+  </html>

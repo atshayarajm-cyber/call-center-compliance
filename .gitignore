@@ -1,0 +1,19 @@
+.venv/
+backend/.venv/
+backend/.env
+frontend-static/node_modules/
+frontend/node_modules/
+backend/app_data/
+backend/runtime_storage/
+runtime_storage/
+test-audio/
+*.sqlite
+*.db
+*.db-journal
+*-journal
+*.log
+*.pyc
+__pycache__/
+.DS_Store
+Thumbs.db
+Recording *.mp4

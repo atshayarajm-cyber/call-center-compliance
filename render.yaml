@@ -1,0 +1,51 @@
+services:
+  - type: web
+    name: calliq-call-compliance
+    env: python
+    rootDir: backend
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: BACKEND_ENV
+        value: production
+      - key: BACKEND_DEBUG
+        value: "false"
+      - key: BACKEND_HOST
+        value: 0.0.0.0
+      - key: BACKEND_PORT
+        value: "8000"
+      - key: BACKEND_TASK_MODE
+        value: background
+      - key: LOCAL_STORAGE_DIR
+        value: ./runtime_storage
+      - key: DATABASE_URL
+        value: sqlite:///./runtime_storage/call_center.db
+      - key: REDIS_URL
+        value: redis://localhost:6379/0
+      - key: CELERY_BROKER_URL
+        value: memory://
+      - key: CELERY_RESULT_BACKEND
+        value: cache+memory://
+      - key: API_KEYS
+        sync: false
+      - key: ADMIN_API_KEYS
+        sync: false
+      - key: FASTER_WHISPER_MODEL
+        value: tiny
+      - key: FASTER_WHISPER_DEVICE
+        value: cpu
+      - key: FASTER_WHISPER_COMPUTE_TYPE
+        value: int8
+      - key: FASTER_WHISPER_CPU_THREADS
+        value: "8"
+      - key: FASTER_WHISPER_NUM_WORKERS
+        value: "1"
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: OPENAI_MODEL
+        value: gpt-4.1-mini
+      - key: SUMMARY_PROVIDER
+        value: local
+      - key: FRONTEND_URL
+        sync: false
