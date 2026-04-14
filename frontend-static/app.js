@@ -104,6 +104,19 @@ function normalizeApiBase(value) {
     normalized = normalized.slice(0, -"/health".length);
   }
 
+  try {
+    const url = new URL(normalized);
+    const isLocalFrontend =
+      ["localhost", "127.0.0.1"].includes(window.location.hostname) && window.location.port === "5500";
+    const isLocalApi = ["localhost", "127.0.0.1"].includes(url.hostname);
+
+    if (isLocalFrontend && isLocalApi && url.port !== "8000") {
+      return DEFAULT_API_BASE;
+    }
+  } catch {
+    return DEFAULT_API_BASE;
+  }
+
   return normalized || DEFAULT_API_BASE;
 }
 
